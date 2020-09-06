@@ -1,0 +1,9 @@
+https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-3.1&tabs=visual-studio-code
+
+https://docs.microsoft.com/en-us/ef/core/get-started/?tabs=visual-studio
+
+exception handling:
+
+https://docs.microsoft.com/en-us/aspnet/core/web-api/handle-errors?view=aspnetcore-3.1
+https://stackoverflow.com/questions/38630076/asp-net-core-web-api-exception-handling
+https://www.youtube.com/watch?v=95EbHz3aKYA
