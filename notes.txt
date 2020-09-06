@@ -1,9 +1,88 @@
+Links:
+
 https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-3.1&tabs=visual-studio-code
 
 https://docs.microsoft.com/en-us/ef/core/get-started/?tabs=visual-studio
 
 exception handling:
-
 https://docs.microsoft.com/en-us/aspnet/core/web-api/handle-errors?view=aspnetcore-3.1
 https://stackoverflow.com/questions/38630076/asp-net-core-web-api-exception-handling
 https://www.youtube.com/watch?v=95EbHz3aKYA
+
+
+https://www.learnentityframeworkcore.com/configuration/many-to-many-relationship-configuration
+
+
+
+
+
+
+Build the solution:
+
+In Visual Studio
+
+
+Create the Sqlite database:
+
+In Visual Studio, Select Eetfestijnkassasystem.Api as startup project and run the following commands in Package Manager Console:
+
+````
+Install-Package Microsoft.EntityFrameworkCore.Tools
+```
+
+The Add-Migration command scaffolds a migration to create the initial set of tables for the model. 
+```
+Add-Migration InitialCreate
+```
+
+The Update-Database command creates the database and applies the new migration to it.
+```
+Update-Database
+```
+
+
+
+
+Test API with Postman:
+
+POST new menu item:
+* Create a new request.
+* Set the HTTP method to POST.
+* Set the URI to https://localhost:<port>/api/MenuItems.
+* Select the Body tab.
+* Select the raw radio button.
+* Set the type to JSON (application/json).
+* Enter request body
+```json
+{
+    "name":"Ice Tea",
+    "cost":4
+}
+```
+* Press Send.
+
+GET all menu items:
+* Create a new request.
+* Set the HTTP method to GET.
+* Set the URI to https://localhost:<port>/api/MenuItems.
+* Press Send.
+
+
+POST Order
+
+{
+    "name":"Fredrik",
+    "seating":"Table 4",
+    "items": 
+    [
+        {
+            "name":"Ice Tea",
+            "cost":4
+        },
+        {
+            "name":"Bubble water",
+            "cost":1
+        }
+    ],
+    "comment":"Bring extra napkins"
+}

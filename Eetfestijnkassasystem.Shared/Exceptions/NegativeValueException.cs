@@ -3,9 +3,9 @@ using Eetfestijnkassasystem.Shared.Interface;
 
 namespace Eetfestijnkassasystem.Shared.Exceptions
 {
-    public class NegativeDoubleException<T> : Exception, IEntityException where T : IEntity
+    public class NegativeValueException<T> : Exception, IEntityException where T : IEntity
     {
-        public NegativeDoubleException(T entity, string property, double value)
+        public NegativeValueException(T entity, string property, double value)
         {
             Entitiy = entity;
             Property = property;

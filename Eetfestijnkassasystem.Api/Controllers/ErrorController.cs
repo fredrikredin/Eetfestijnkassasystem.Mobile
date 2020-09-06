@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Eetfestijnkassasystem.Api.Controllers
 {
@@ -18,6 +19,13 @@ namespace Eetfestijnkassasystem.Api.Controllers
     [ApiExplorerSettings(IgnoreApi = true)] // hide controller for swashbuckle swagger
     public class ErrorController : ControllerBase
     {
+        private readonly ILogger _logger;
+
+        public ErrorController(ILogger<ErrorController> logger)
+        {
+            _logger = logger;
+        }
+
         [Route("/error")]
         public IActionResult Error()
         {
@@ -37,10 +45,16 @@ namespace Eetfestijnkassasystem.Api.Controllers
         {
             var exceptionContext = HttpContext.Features.Get<IExceptionHandlerFeature>();
 
-            if (exceptionContext.Error is IEntityException ese)
-                return Problem(ese.StackTrace, null, (int)HttpStatusCode.BadRequest, ese.Message, ese.Type);
+            if (exceptionContext.Error is IEntityException ee)
+            {
+                _logger.LogError(exceptionContext.Error, ee.Type);
+                return Problem(ee.StackTrace, null, (int)HttpStatusCode.BadRequest, ee.Message, ee.Type);
+            }
             else
+            { 
+                _logger.LogError(exceptionContext.Error, exceptionContext.Error.Message);
                 return Problem(detail: exceptionContext.Error.StackTrace, title: exceptionContext.Error.Message);
+            }
         }
     }
 }

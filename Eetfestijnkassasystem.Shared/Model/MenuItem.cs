@@ -1,18 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Eetfestijnkassasystem.Shared.Exceptions;
 using Eetfestijnkassasystem.Shared.Interface;
 
 namespace Eetfestijnkassasystem.Shared.Model
 {
-    public class MenuItem : IEntity
+    public class MenuItem : EntityBase, IEntity
     {
         private double _cost = 0.0;
         private string _name = null;
 
-        public MenuItem() { }
+        public MenuItem() : base() { }
 
-        public int Id { get; set; }
-        public DateTime DateTimeCreated { get; set; }
+        public List<OrderMenuItem> OrderMenuItems { get; set; }
 
         public string Name
         {
@@ -22,7 +23,7 @@ namespace Eetfestijnkassasystem.Shared.Model
                 if (String.IsNullOrWhiteSpace(value))
                     throw new EmptyStringException<MenuItem>(this, nameof(Name));
 
-                _name = value;
+                _name = value.Trim();
             }
         }
 
@@ -32,10 +33,13 @@ namespace Eetfestijnkassasystem.Shared.Model
             set 
             {
                 if (value < 0)
-                    throw new NegativeDoubleException<MenuItem>(this, nameof(Cost), value);
+                    throw new NegativeValueException<MenuItem>(this, nameof(Cost), value);
 
                 _cost = value;
             }
         }
+
+        // [JsonIgnore]
+        public IEnumerable<Order> Orders => OrderMenuItems.Select(o => o.Order);
     }
 }

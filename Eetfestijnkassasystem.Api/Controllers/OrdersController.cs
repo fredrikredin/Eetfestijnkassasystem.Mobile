@@ -1,8 +1,6 @@
-﻿using System;
+﻿using System.Linq;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Eetfestijnkassasystem.Api.Data;
@@ -12,48 +10,48 @@ namespace Eetfestijnkassasystem.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MenuItemsController : ControllerBase
+    public class OrdersController : ControllerBase
     {
         private readonly EetfestijnContext _context;
 
-        public MenuItemsController(EetfestijnContext context)
+        public OrdersController(EetfestijnContext context)
         {
             _context = context;
         }
 
-        // GET: api/MenuItems
+        // GET: api/Orders
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MenuItem>>> GetMenuItem()
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrder()
         {
-            return await _context.MenuItem.ToListAsync();
+            return await _context.Order.ToListAsync();
         }
 
-        // GET: api/MenuItems/5
+        // GET: api/Orders/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<MenuItem>> GetMenuItem(int id)
+        public async Task<ActionResult<Order>> GetOrder(int id)
         {
-            var menuItem = await _context.MenuItem.FindAsync(id);
+            var order = await _context.Order.FindAsync(id);
 
-            if (menuItem == null)
+            if (order == null)
             {
                 return NotFound();
             }
 
-            return menuItem;
+            return order;
         }
 
-        // PUT: api/MenuItems/5
+        // PUT: api/Orders/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMenuItem(int id, MenuItem menuItem)
+        public async Task<IActionResult> PutOrder(int id, Order order)
         {
-            if (id != menuItem.Id)
+            if (id != order.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(menuItem).State = EntityState.Modified;
+            _context.Entry(order).State = EntityState.Modified;
 
             try
             {
@@ -61,7 +59,7 @@ namespace Eetfestijnkassasystem.Api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MenuItemExists(id))
+                if (!OrderExists(id))
                 {
                     return NotFound();
                 }
@@ -74,40 +72,46 @@ namespace Eetfestijnkassasystem.Api.Controllers
             return NoContent();
         }
 
-        // POST: api/MenuItems
+        // POST: api/Orders
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<MenuItem>> PostMenuItem(MenuItem menuItem)
+        public async Task<ActionResult<Order>> PostOrder(Order order)
         {
-            //menuItem.DateTimeCreated = DateTime.Now;
+            for (int i = 0; i < order.OrderMenuItems.Count; i++)
+            {
+                var existingMenuItem = await _context.MenuItem.FirstOrDefaultAsync(
+                    o => o.Name.ToLower().Equals(order.OrderMenuItems[i].MenuItem.Name.ToLower()));
 
-            _context.MenuItem.Add(menuItem);
+                if (existingMenuItem != null)
+                    order.OrderMenuItems[i].MenuItem = existingMenuItem;
+            }
+
+            _context.Order.Add(order);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetMenuItem", new { id = menuItem.Id }, menuItem);
+            return CreatedAtAction("GetOrder", new { id = order.Id }, order);
         }
 
-        // DELETE: api/MenuItems/5
+        // DELETE: api/Orders/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<MenuItem>> DeleteMenuItem(int id)
+        public async Task<ActionResult<Order>> DeleteOrder(int id)
         {
-            var menuItem = await _context.MenuItem.FindAsync(id);
-            
-            if (menuItem == null)
+            var order = await _context.Order.FindAsync(id);
+            if (order == null)
             {
                 return NotFound();
             }
 
-            _context.MenuItem.Remove(menuItem);
+            _context.Order.Remove(order);
             await _context.SaveChangesAsync();
 
-            return menuItem;
+            return order;
         }
 
-        private bool MenuItemExists(int id)
+        private bool OrderExists(int id)
         {
-            return _context.MenuItem.Any(e => e.Id == id);
+            return _context.Order.Any(e => e.Id == id);
         }
     }
 }

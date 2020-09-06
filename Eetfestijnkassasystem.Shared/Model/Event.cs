@@ -1,20 +1,28 @@
-﻿using Eetfestijnkassasystem.Shared.Interface;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Eetfestijnkassasystem.Shared.Exceptions;
+using Eetfestijnkassasystem.Shared.Interface;
 
 namespace Eetfestijnkassasystem.Shared.Model
 {
-    public class Event : IEntity
+    public class Event : EntityBase, IEntity
     {
-        public Event() 
-        {
-        
-        }
+        private string _name = null;
 
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public DateTime DateTimeCreated { get; set; }
+        public Event() : base() { }
+
         public List<Order> Orders { get; set; }
+        
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                if (String.IsNullOrWhiteSpace(value))
+                    throw new EmptyStringException<Event>(this, nameof(Name));
+
+                _name = value.Trim();
+            }
+        }
     }
 }
