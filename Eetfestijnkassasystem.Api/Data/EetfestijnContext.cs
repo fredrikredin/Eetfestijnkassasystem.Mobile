@@ -10,24 +10,24 @@ namespace Eetfestijnkassasystem.Api.Data
             
         }
 
-        public DbSet<MenuItem> MenuItem { get; set; }
-        public DbSet<Order> Order { get; set; }
-        public DbSet<Payment> Payment { get; set; }
-        public DbSet<Event> Event { get; set; }
+        public DbSet<MenuItemModel> MenuItem { get; set; }
+        public DbSet<OrderModel> Order { get; set; }
+        public DbSet<PaymentModel> Payment { get; set; }
+        public DbSet<EventModel> Event { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // ignore non-serialized properties
-            modelBuilder.Entity<Order>().Ignore(o => o.Items);
-            modelBuilder.Entity<Order>().Ignore(o => o.IsPaid);
-            modelBuilder.Entity<Order>().Ignore(o => o.TotalCost);
-            modelBuilder.Entity<MenuItem>().Ignore(o => o.Orders);
+            //modelBuilder.Entity<Order>().Ignore(o => o.Items);
+            //modelBuilder.Entity<Order>().Ignore(o => o.IsPaid);
+            //modelBuilder.Entity<Order>().Ignore(o => o.TotalCost);
+            //modelBuilder.Entity<MenuItem>().Ignore(o => o.Orders);
 
             // configure many-to-many rel. between Order and MenuItem via "join/bridging" table OrderMenuItem,
             // and ensure when Order or MenuItem is deleted, so are related entries in OrderMenuItem table.
             modelBuilder.Entity<OrderMenuItem>()
                         .HasKey(omi => new { omi.OrderId, omi.MenuItemId });
-            
+
             modelBuilder.Entity<OrderMenuItem>()
                         .HasOne(omi => omi.Order)
                         .WithMany(b => b.OrderMenuItems)

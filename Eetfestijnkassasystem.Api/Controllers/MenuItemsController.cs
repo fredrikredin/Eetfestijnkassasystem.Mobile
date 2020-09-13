@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Eetfestijnkassasystem.Api.Data;
 using Eetfestijnkassasystem.Shared.Model;
+using Eetfestijnkassasystem.Shared.DTO;
+using System.Net;
 
 namespace Eetfestijnkassasystem.Api.Controllers
 {
@@ -25,35 +27,41 @@ namespace Eetfestijnkassasystem.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MenuItem>>> GetMenuItem()
         {
-            return await _context.MenuItem.ToListAsync();
+            List<MenuItemModel> models = await _context.MenuItem.ToListAsync();
+            List<MenuItem> dtos = models.Select(o => o.ToTransferObject()).ToList();
+            return dtos;
         }
 
         // GET: api/MenuItems/5
         [HttpGet("{id}")]
         public async Task<ActionResult<MenuItem>> GetMenuItem(int id)
         {
-            var menuItem = await _context.MenuItem.FindAsync(id);
+            MenuItemModel model = await _context.MenuItem.FindAsync(id);
 
-            if (menuItem == null)
-            {
+            if (model == null)
                 return NotFound();
-            }
 
-            return menuItem;
+            return model.ToTransferObject();
         }
 
         // PUT: api/MenuItems/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
+        //public async Task<IActionResult> PutMenuItem(int id, MenuItem menuItem)
         public async Task<IActionResult> PutMenuItem(int id, MenuItem menuItem)
         {
             if (id != menuItem.Id)
-            {
                 return BadRequest();
-            }
 
-            _context.Entry(menuItem).State = EntityState.Modified;
+            MenuItemModel model = await _context.MenuItem.FindAsync(id);
+
+            if (model == null)
+                return BadRequest($"No menu item found with specified id {id}");
+
+            model.Name = menuItem.Name;
+            model.Cost = model.Cost;
+            _context.Entry(model).State = EntityState.Modified;
 
             try
             {
@@ -78,31 +86,37 @@ namespace Eetfestijnkassasystem.Api.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
+        //public async Task<ActionResult<MenuItem>> PostMenuItem(MenuItem menuItem)
         public async Task<ActionResult<MenuItem>> PostMenuItem(MenuItem menuItem)
         {
             //menuItem.DateTimeCreated = DateTime.Now;
+            MenuItemModel model = new MenuItemModel() 
+            { 
+                Name = menuItem.Name, 
+                Cost = menuItem.Cost 
+            };
 
-            _context.MenuItem.Add(menuItem);
+            _context.MenuItem.Add(model);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetMenuItem", new { id = menuItem.Id }, menuItem);
+            return CreatedAtAction("GetMenuItem", new { id = model.Id }, model.ToTransferObject());
         }
 
         // DELETE: api/MenuItems/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<MenuItem>> DeleteMenuItem(int id)
         {
-            var menuItem = await _context.MenuItem.FindAsync(id);
+            if (id == 0)
+                return BadRequest();
+
+            var model = await _context.MenuItem.FindAsync(id);
             
-            if (menuItem == null)
-            {
+            if (model == null)
                 return NotFound();
-            }
 
-            _context.MenuItem.Remove(menuItem);
+            _context.MenuItem.Remove(model);
             await _context.SaveChangesAsync();
-
-            return menuItem;
+            return model.ToTransferObject();
         }
 
         private bool MenuItemExists(int id)

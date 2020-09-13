@@ -1,20 +1,15 @@
 ﻿using System;
+using System.Linq;
+using Eetfestijnkassasystem.Shared.Abstract;
 using Eetfestijnkassasystem.Shared.Interface;
 
 namespace Eetfestijnkassasystem.Shared.Exceptions
 {
-    public class EmptyStringException<T> : Exception, IEntityException where T : IEntity
+    public class EmptyStringException : EntityExceptionBase
     {
-        public EmptyStringException(T entity, string property)
+        public EmptyStringException(string model, string property) : base(model, property)
         {
-            Entity = entity;
-            Property = property;
+            Type = $"{GetType().Name.Replace("`1", "")}: {nameof(Model)}={Model}, {nameof(Property)}={Property}";
         }
-
-        public T Entity { get; set; }
-        public string Property { get; set; }
-
-        public string Type => 
-            $"{GetType().Name.Replace("`1", "")}<{typeof(T).Name}>({ nameof(Property)}={Property})";
     }
 }

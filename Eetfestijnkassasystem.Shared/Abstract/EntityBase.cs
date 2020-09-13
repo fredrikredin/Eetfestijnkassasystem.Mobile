@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Eetfestijnkassasystem.Shared.Model
+namespace Eetfestijnkassasystem.Shared.Abstract
 {
     public abstract class EntityBase
     {

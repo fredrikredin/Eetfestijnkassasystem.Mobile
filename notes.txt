@@ -1,3 +1,9 @@
+Issues:
+
+
+The instance of entity type 'OrderMenuItem' cannot be tracked because another instance with the same key value for {'OrderId', 'MenuItemId'} is already being tracked. When attaching existing entities, ensure that only one entity instance with a given key value is attached. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see the conflicting key values.
+
+
 Links:
 
 https://docs.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-3.1&tabs=visual-studio-code
@@ -13,7 +19,7 @@ https://www.youtube.com/watch?v=95EbHz3aKYA
 https://www.learnentityframeworkcore.com/configuration/many-to-many-relationship-configuration
 
 
-
+https://dotnetcoretutorials.com/2020/03/15/fixing-json-self-referencing-loop-exceptions/
 
 
 
