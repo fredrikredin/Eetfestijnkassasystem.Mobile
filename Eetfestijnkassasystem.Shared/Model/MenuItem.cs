@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Eetfestijnkassasystem.Shared.Abstract;
 using Eetfestijnkassasystem.Shared.DTO;
 using Eetfestijnkassasystem.Shared.Exceptions;
-using Eetfestijnkassasystem.Shared.Interface;
 
 namespace Eetfestijnkassasystem.Shared.Model
 {
-    public class MenuItemModel : EntityBase, IModelFor<MenuItem>
+    public class MenuItem : EntityBase
     {
         private double _cost = 0.0;
         private string _name = null;
 
-        public MenuItemModel() : base() 
+        public MenuItem() : base() 
         {
             if (OrderMenuItems == null)
                 OrderMenuItems = new List<OrderMenuItem>();
@@ -26,8 +23,8 @@ namespace Eetfestijnkassasystem.Shared.Model
             get { return _name; }
             set 
             {
-                if (String.IsNullOrWhiteSpace(value))
-                    throw new EmptyStringException(nameof(MenuItem), nameof(Name));
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new EmptyStringException(nameof(MenuItemDto), nameof(Name));
 
                 _name = value.Trim();
             }
@@ -39,22 +36,10 @@ namespace Eetfestijnkassasystem.Shared.Model
             set 
             {
                 if (value < 0)
-                    throw new NegativeValueException(nameof(MenuItem), nameof(Cost), value);
+                    throw new NegativeValueException(nameof(MenuItemDto), nameof(Cost), value);
 
                 _cost = value;
             }
-        }
-
-        public MenuItem ToTransferObject()
-        {
-            return new MenuItem()
-            {
-                Id = this.Id,
-                DateTimeCreated = this.DateTimeCreated,
-                Name = this.Name,
-                Cost = this.Cost,
-                Orders = this.OrderMenuItems.Select(o => o.OrderId).ToList()
-            };
         }
     }
 }

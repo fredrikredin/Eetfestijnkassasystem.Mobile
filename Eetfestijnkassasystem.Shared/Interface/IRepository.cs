@@ -6,7 +6,7 @@ namespace Eetfestijnkassasystem.Shared.Interface
     public interface IRepository<T>
     {
         Task<IEnumerable<T>> GetAllAsync();
-        Task<T> GetAsync(int id);
+        Task<T> GetByIdAsync(int id);
         Task<T> AddAsync(T entity);
         Task RemoveAsync(T entity);
         Task UpdateAsync(T entity);

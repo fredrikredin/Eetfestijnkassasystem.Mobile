@@ -11,7 +11,7 @@ using Xamarin.Essentials;
 
 namespace Eetfestijnkassasystem.Mobile.Services
 {
-    public class OrderRepository : IRepository<Order>
+    public class OrderRepository : IRepository<OrderDto>
     {
         private readonly HttpClient _httpClient;
         private bool _isConnected => Connectivity.NetworkAccess == NetworkAccess.Internet;
@@ -21,7 +21,7 @@ namespace Eetfestijnkassasystem.Mobile.Services
             _httpClient = GetHttpClient();
         }
 
-        public async Task<Order> AddAsync(Order entity)
+        public async Task<OrderDto> AddAsync(OrderDto entity)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace Eetfestijnkassasystem.Mobile.Services
 
                 // response.Headers.Location = "...api/Orders/{new id}
                 string responseBody = await response.Content.ReadAsStringAsync();
-                Order createdOrder = await DeserializeOrderAsync(responseBody);
+                OrderDto createdOrder = await DeserializeOrderAsync(responseBody);
                 return createdOrder;
             }
             catch (Exception ex)
@@ -47,7 +47,7 @@ namespace Eetfestijnkassasystem.Mobile.Services
             }
         }
 
-        public async Task<IEnumerable<Order>> GetAllAsync()
+        public async Task<IEnumerable<OrderDto>> GetAllAsync()
         {
             try
             {
@@ -65,36 +65,36 @@ namespace Eetfestijnkassasystem.Mobile.Services
             }
         }
 
-        public async Task<Order> GetAsync(int id)
+        public async Task<OrderDto> GetByIdAsync(int id)
         {
             if (!_isConnected || id <= 0)
                 return null;
 
             var jsonResponse = await _httpClient.GetStringAsync($"api/Orders/{id}");
-            Order order = await DeserializeOrderAsync(jsonResponse);
+            OrderDto order = await DeserializeOrderAsync(jsonResponse);
             return order;
 
             //return await Task.Run(() => JsonConvert.DeserializeObject<Order>(jsonResponse));
         }
 
-        public async Task RemoveAsync(Order entity)
+        public async Task RemoveAsync(OrderDto entity)
         {
             throw new NotImplementedException();
         }
 
-        public async Task UpdateAsync(Order entity)
+        public async Task UpdateAsync(OrderDto entity)
         {
             throw new NotImplementedException();
         }
 
-        private async Task<Order> DeserializeOrderAsync(string jsonResponse)
+        private async Task<OrderDto> DeserializeOrderAsync(string jsonResponse)
         {
-            return await Task.Run(() => JsonConvert.DeserializeObject<Order>(jsonResponse));
+            return await Task.Run(() => JsonConvert.DeserializeObject<OrderDto>(jsonResponse));
         }
 
-        private async Task<IEnumerable<Order>> DeserializeOrdersAsync(string jsonResponse)
+        private async Task<IEnumerable<OrderDto>> DeserializeOrdersAsync(string jsonResponse)
         {
-            return await Task.Run(() => JsonConvert.DeserializeObject<IEnumerable<Order>>(jsonResponse));
+            return await Task.Run(() => JsonConvert.DeserializeObject<IEnumerable<OrderDto>>(jsonResponse));
         }
 
         private HttpClient GetHttpClient()

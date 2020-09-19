@@ -10,10 +10,10 @@ namespace Eetfestijnkassasystem.Api.Data
             
         }
 
-        public DbSet<MenuItemModel> MenuItem { get; set; }
-        public DbSet<OrderModel> Order { get; set; }
-        public DbSet<PaymentModel> Payment { get; set; }
-        public DbSet<EventModel> Event { get; set; }
+        public DbSet<MenuItem> MenuItem { get; set; }
+        public DbSet<Order> Order { get; set; }
+        public DbSet<Payment> Payment { get; set; }
+        public DbSet<Event> Event { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

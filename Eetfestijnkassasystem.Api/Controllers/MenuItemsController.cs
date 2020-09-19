@@ -9,6 +9,7 @@ using Eetfestijnkassasystem.Api.Data;
 using Eetfestijnkassasystem.Shared.Model;
 using Eetfestijnkassasystem.Shared.DTO;
 using System.Net;
+using AutoMapper;
 
 namespace Eetfestijnkassasystem.Api.Controllers
 {
@@ -17,31 +18,35 @@ namespace Eetfestijnkassasystem.Api.Controllers
     public class MenuItemsController : ControllerBase
     {
         private readonly EetfestijnContext _context;
+        private readonly IMapper _mapper;
 
-        public MenuItemsController(EetfestijnContext context)
+        public MenuItemsController(EetfestijnContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/MenuItems
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MenuItem>>> GetMenuItem()
+        public async Task<ActionResult<IEnumerable<MenuItemDto>>> GetMenuItem()
         {
-            List<MenuItemModel> models = await _context.MenuItem.ToListAsync();
-            List<MenuItem> dtos = models.Select(o => o.ToTransferObject()).ToList();
+            List<MenuItem> models = await _context.MenuItem.ToListAsync();
+            //List<MenuItemDto> dtos = models.Select(o => o.ToTransferObject()).ToList();
+            List<MenuItemDto> dtos = models.Select(o => _mapper.Map<MenuItemDto>(o)).ToList();
             return dtos;
         }
 
         // GET: api/MenuItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<MenuItem>> GetMenuItem(int id)
+        public async Task<ActionResult<MenuItemDto>> GetMenuItem(int id)
         {
-            MenuItemModel model = await _context.MenuItem.FindAsync(id);
+            MenuItem model = await _context.MenuItem.FindAsync(id);
 
             if (model == null)
                 return NotFound();
 
-            return model.ToTransferObject();
+            //return model.ToTransferObject();
+            return _mapper.Map<MenuItemDto>(model);
         }
 
         // PUT: api/MenuItems/5
@@ -49,12 +54,12 @@ namespace Eetfestijnkassasystem.Api.Controllers
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
         //public async Task<IActionResult> PutMenuItem(int id, MenuItem menuItem)
-        public async Task<IActionResult> PutMenuItem(int id, MenuItem menuItem)
+        public async Task<IActionResult> PutMenuItem(int id, MenuItemDto menuItem)
         {
             if (id != menuItem.Id)
                 return BadRequest();
 
-            MenuItemModel model = await _context.MenuItem.FindAsync(id);
+            MenuItem model = await _context.MenuItem.FindAsync(id);
 
             if (model == null)
                 return BadRequest($"No menu item found with specified id {id}");
@@ -87,10 +92,10 @@ namespace Eetfestijnkassasystem.Api.Controllers
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
         //public async Task<ActionResult<MenuItem>> PostMenuItem(MenuItem menuItem)
-        public async Task<ActionResult<MenuItem>> PostMenuItem(MenuItem menuItem)
+        public async Task<ActionResult<MenuItemDto>> PostMenuItem(MenuItemDto menuItem)
         {
             //menuItem.DateTimeCreated = DateTime.Now;
-            MenuItemModel model = new MenuItemModel() 
+            MenuItem model = new MenuItem() 
             { 
                 Name = menuItem.Name, 
                 Cost = menuItem.Cost 
@@ -99,12 +104,14 @@ namespace Eetfestijnkassasystem.Api.Controllers
             _context.MenuItem.Add(model);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetMenuItem", new { id = model.Id }, model.ToTransferObject());
+            MenuItemDto dto = _mapper.Map<MenuItemDto>(model);
+
+            return CreatedAtAction("GetMenuItem", new { id = model.Id }, dto);
         }
 
         // DELETE: api/MenuItems/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<MenuItem>> DeleteMenuItem(int id)
+        public async Task<ActionResult<MenuItemDto>> DeleteMenuItem(int id)
         {
             if (id == 0)
                 return BadRequest();
@@ -116,7 +123,9 @@ namespace Eetfestijnkassasystem.Api.Controllers
 
             _context.MenuItem.Remove(model);
             await _context.SaveChangesAsync();
-            return model.ToTransferObject();
+            return Ok();
+
+            //return model.ToTransferObject();
         }
 
         private bool MenuItemExists(int id)

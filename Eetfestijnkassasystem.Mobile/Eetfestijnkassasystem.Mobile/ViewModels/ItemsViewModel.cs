@@ -61,31 +61,33 @@ namespace Eetfestijnkassasystem.Mobile.ViewModels
 
             try
             {
-                IRepository<Order> orderRepository = DependencyService.Get<IRepository<Order>>();
+                IRepository<OrderDto> orderRepository = DependencyService.Get<IRepository<OrderDto>>();
 
                 // order 1
-                //Order order1 = new Order() { CustomerName = "Linake", Comment = "Extra napkins", Seating = "Table 7", };
-                //order1.MenuItems.Add(new Shared.DTO.MenuItem() { Name = "Cheese burger", Cost = 6.0 });
-                //order1.MenuItems.Add(new Shared.DTO.MenuItem() { Name = "Coke", Cost = 3.0 });
-                //order1.MenuItems.Add(new Shared.DTO.MenuItem() { Name = "Sparkling water", Cost = 2.0 });
-                //order1 = await orderRepository.AddAsync(order1);
+                OrderDto order1 = new OrderDto() { CustomerName = "Linake", Comment = "Extra napkins", Seating = "Table 7", };
+                order1.MenuItems.Add(new MenuItemDto() { Name = "Cheese burger", Cost = 6.0 });
+                order1.MenuItems.Add(new MenuItemDto() { Name = "Coke", Cost = 3.0 });
+                order1.MenuItems.Add(new MenuItemDto() { Name = "Sparkling water", Cost = 2.0 });
+                order1 = await orderRepository.AddAsync(order1);
 
-                //// order 2
-                //Order order2 = new Order("Linake");
-                //order2.MenuItems.Add(order1.MenuItems[0]);
-                //order2.MenuItems.Add(new Shared.DTO.MenuItem("cheese  burger") { Cost = 99 });
-                //order2.MenuItems.Add(new Shared.DTO.MenuItem("sparkling WATER ") { Cost = 999 });
-                //order2 = await orderRepository.AddAsync(order2);
+                //OrderDto order1 = await orderRepository.GetByIdAsync(1);
 
-                //Order order2 = await orderRepository.GetAsync(2);
-                //Shared.DTO.MenuItem waterSparkling = order2.MenuItems.FirstOrDefault(o => o.Name == "Sparkling water");
+                MenuItemDto cheeseBurger = order1.MenuItems[0];
+                MenuItemDto sparklingWater = order1.MenuItems[2];
 
-                //// order 3
-                //Order order3 = new Order("3 sparkling water") { Seating = "Bar 2", Comment = "No ice" };
-                //order3.MenuItems.Add(waterSparkling);
-                //order3.MenuItems.Add(waterSparkling);
-                //order3.MenuItems.Add(waterSparkling);
-                //order3 = await orderRepository.AddAsync(order3);
+                // order 2
+                OrderDto order2 = new OrderDto("Linake");
+                order2.MenuItems.Add(cheeseBurger);
+                order2.MenuItems.Add(new MenuItemDto("vegan burger") { Cost = 99 });
+                order2.MenuItems.Add(new MenuItemDto("sparkling WATER ") { Cost = 999 });
+                order2 = await orderRepository.AddAsync(order2);
+
+                // order 3
+                OrderDto order3 = new OrderDto("3 sparkling water") { Seating = "Bar 2", Comment = "No ice" };
+                order3.MenuItems.Add(sparklingWater);
+                order3.MenuItems.Add(sparklingWater);
+                order3.MenuItems.Add(sparklingWater);
+                order3 = await orderRepository.AddAsync(order3);
 
                 //
                 var allOrders = await orderRepository.GetAllAsync();

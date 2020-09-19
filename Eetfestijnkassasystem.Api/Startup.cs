@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Eetfestijnkassasystem.Api.Data;
+using AutoMapper;
 
 namespace Eetfestijnkassasystem.Api
 {
@@ -23,6 +24,7 @@ namespace Eetfestijnkassasystem.Api
             services.AddControllers();
             //services.AddSingleton<IRepository<MenuItem>, MenuRepository>();
             services.AddDbContext<EetfestijnContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddAutoMapper(typeof(Startup));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -7,6 +7,9 @@
 Eetfestijnkassasystem.Mobile/Eetfestijnkassasystem.Api/Data/eetfestijn.db
 Eetfestijnkassasystem.Mobile/Eetfestijnkassasystem.Api/Migrations/
 
+# Helper scripts
+deleteAndroidBinObjDir.bat
+
 # User-specific files
 *.rsuser
 *.suo
