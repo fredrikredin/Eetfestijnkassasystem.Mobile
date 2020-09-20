@@ -9,7 +9,7 @@ namespace Eetfestijnkassasystem.Shared.Exceptions
     {
         public EmptyStringException(string model, string property) : base(model, property)
         {
-            Type = $"{GetType().Name.Replace("`1", "")}: {nameof(Model)}={Model}, {nameof(Property)}={Property}";
+            Type = $"{GetType().Name}: {nameof(Model)}={Model}, {nameof(Property)}={Property}";
         }
     }
 }

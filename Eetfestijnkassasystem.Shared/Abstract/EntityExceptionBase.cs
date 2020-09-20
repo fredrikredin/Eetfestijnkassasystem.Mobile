@@ -5,7 +5,7 @@ namespace Eetfestijnkassasystem.Shared.Abstract
 {
     public abstract class EntityExceptionBase : Exception, IEntityException
     {
-        public EntityExceptionBase(string model, string property)
+        public EntityExceptionBase(string model, string property, string message = null) : base(message)
         {
             Model = model;
             Property = property;

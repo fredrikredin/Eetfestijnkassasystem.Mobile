@@ -37,7 +37,7 @@ namespace Eetfestijnkassasystem.Mobile.Services
 
                 // response.Headers.Location = "...api/Orders/{new id}
                 string responseBody = await response.Content.ReadAsStringAsync();
-                OrderDto createdOrder = await DeserializeOrderAsync(responseBody);
+                OrderDto createdOrder = Deserialize<OrderDto>(responseBody);
                 return createdOrder;
             }
             catch (Exception ex)
@@ -55,7 +55,7 @@ namespace Eetfestijnkassasystem.Mobile.Services
                     return null;
 
                 var jsonResponse = await _httpClient.GetStringAsync($"api/Orders");
-                var orders = await DeserializeOrdersAsync(jsonResponse);
+                IEnumerable<OrderDto> orders = Deserialize<IEnumerable<OrderDto>>(jsonResponse);
                 //var orders = await Task.Run(() => JsonConvert.DeserializeObject<IEnumerable<Order>>(jsonResponse));
                 return orders;
             }
@@ -71,10 +71,8 @@ namespace Eetfestijnkassasystem.Mobile.Services
                 return null;
 
             var jsonResponse = await _httpClient.GetStringAsync($"api/Orders/{id}");
-            OrderDto order = await DeserializeOrderAsync(jsonResponse);
+            OrderDto order = Deserialize<OrderDto>(jsonResponse);
             return order;
-
-            //return await Task.Run(() => JsonConvert.DeserializeObject<Order>(jsonResponse));
         }
 
         public async Task RemoveAsync(OrderDto entity)
@@ -82,19 +80,53 @@ namespace Eetfestijnkassasystem.Mobile.Services
             throw new NotImplementedException();
         }
 
-        public async Task UpdateAsync(OrderDto entity)
+        public async Task<OrderDto> UpdateAsync(OrderDto entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                VerifyInternetNetworkAccess();
+
+                if (entity == null)
+                    throw new ArgumentNullException($"Unable to update {typeof(OrderDto).Name}, entity is undefined.");
+
+                if (entity.Id == 0)
+                    throw new ArgumentNullException($"Unable to update {typeof(OrderDto).Name}, entity has no id.");
+
+                StringContent requestBody = await SerializeOrderIntoRequestBody(entity);
+                HttpResponseMessage response = await _httpClient.PutAsync($"api/Orders/{entity.Id}", requestBody);
+                //response.EnsureSuccessStatusCode();
+
+                // response.Headers.Location = "...api/Orders/{new id}
+                string responseBody = await response.Content.ReadAsStringAsync();
+                OrderDto createdOrder = Deserialize<OrderDto>(responseBody);
+                
+                return createdOrder;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
-        private async Task<OrderDto> DeserializeOrderAsync(string jsonResponse)
+        private void VerifyInternetNetworkAccess()
         {
-            return await Task.Run(() => JsonConvert.DeserializeObject<OrderDto>(jsonResponse));
+            if (!_isConnected)
+                throw new HttpRequestException($"No internet connection (NetworkAccess={Connectivity.NetworkAccess})");
         }
 
-        private async Task<IEnumerable<OrderDto>> DeserializeOrdersAsync(string jsonResponse)
+        private async Task<StringContent> SerializeOrderIntoRequestBody(OrderDto orderDto)
         {
-            return await Task.Run(() => JsonConvert.DeserializeObject<IEnumerable<OrderDto>>(jsonResponse));
+            return await Task.Run(() => 
+            {
+                string serializedOrder = JsonConvert.SerializeObject(orderDto);
+                return new StringContent(serializedOrder, Encoding.UTF8, "application/json");
+            });
+        }
+
+        // move to RepositoryBase class?
+        private T Deserialize<T>(string jsonResponse)
+        {
+            return JsonConvert.DeserializeObject<T>(jsonResponse);
         }
 
         private HttpClient GetHttpClient()
@@ -105,7 +137,5 @@ namespace Eetfestijnkassasystem.Mobile.Services
 #endif
             return new HttpClient(httpHandler) { BaseAddress = new Uri($"{App.Settings.BackendUrl}/"), };
         }
-
-       
     }
 }

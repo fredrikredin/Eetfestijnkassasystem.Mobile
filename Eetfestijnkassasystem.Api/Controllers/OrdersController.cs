@@ -30,6 +30,7 @@ namespace Eetfestijnkassasystem.Api.Controllers
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrder()
         {
             List<Order> orders = await _context.Order
+                                               .Include(o => o.Payment)
                                                .Include(o => o.OrderMenuItems)
                                                .ThenInclude(o => o.MenuItem)
                                                .OrderByDescending(o => o.Id)
@@ -47,10 +48,7 @@ namespace Eetfestijnkassasystem.Api.Controllers
             if (id == 0)
                 return BadRequest("Order id not specified");
 
-            Order model = await _context.Order
-                                        .Include(o => o.OrderMenuItems)
-                                        .ThenInclude(o => o.MenuItem)
-                                        .FirstOrDefaultAsync(o => o.Id == id);
+            Order model = await FindOrderById(id);
 
             if (model == null)
                 return NotFound($"Order with id {id} not found");
@@ -64,32 +62,48 @@ namespace Eetfestijnkassasystem.Api.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrder(int id, OrderDto order)
+        public async Task<IActionResult> PutOrder(int id, OrderDto orderDto)
         {
             try
             {
-                if (id == 0 || id != order.Id)
+                if (id == 0 || id != orderDto.Id)
                     return BadRequest();
 
-                Order model = await _context.Order.FindAsync(id);
+                Order order = await FindOrderById(id);
 
-                if (model == null)
+                if (order == null)
                     return NotFound();
 
-                model.CustomerName = order.CustomerName;
-                model.Comment = order.Comment;
-                model.Seating = order.Seating;
+                order.CustomerName = orderDto.CustomerName;
+                order.Comment = orderDto.Comment;
+                order.Seating = orderDto.Seating;
 
-                //model.Payment = order?.Payment.ToModelEntity();
-                Payment payment = _mapper.Map<Payment>(order.Payment);
-                model.Payment = payment;
+                // update items
+                order.OrderMenuItems.Clear();
+                order.OrderMenuItems.AddRange(await CreateOrderMenuItemsAsync(orderDto.MenuItems));
 
-                model.OrderMenuItems.Clear();
-                model.OrderMenuItems.AddRange(await CreateOrderMenuItemsAsync(order.MenuItems));
-                
-                _context.Entry(model).State = EntityState.Modified;
+                // update payment
+                if (orderDto.Payment != null)
+                {
+                    if (order.Payment == null)
+                        order.Payment = _mapper.Map<Payment>(orderDto.Payment);
+                    else
+                    {
+                        order.Payment.AmountCashPaid = orderDto.Payment.AmountCashPaid;
+                        order.Payment.AmountCashReturn = orderDto.Payment.AmountCashReturn;
+                        order.Payment.NumberOfPaymentCards = orderDto.Payment.NumberOfPaymentCards;
+                        order.Payment.TotalCost = orderDto.Payment.TotalCost;
+                    }
+                }
+                else if (order.Payment != null)
+                    _context.Entry(order.Payment).State = EntityState.Deleted; // sets order.Payment to null
+
+                _context.Entry(order).State = EntityState.Modified;
 
                 await _context.SaveChangesAsync();
+
+                OrderDto updatedOrder = _mapper.Map<OrderDto>(order);
+                return Ok(updatedOrder);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -102,53 +116,25 @@ namespace Eetfestijnkassasystem.Api.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+          
+            //return NoContent();
         }
 
         // POST: api/Orders
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<OrderDto>> PostOrder(OrderDto order)
+        public async Task<ActionResult<OrderDto>> PostOrder(OrderDto orderDto)
         {
             try
             {
+                Order newOrder = _mapper.Map<Order>(orderDto);
+                newOrder.OrderMenuItems.AddRange(await CreateOrderMenuItemsAsync(orderDto.MenuItems));
 
-
-                //Order newOrderModel = order.ToModelEntity();
-                Order newOrderModel = _mapper.Map<Order>(order);
-
-                //List<OrderMenuItem> newOrderMenuItems = new List<OrderMenuItem>();
-
-                //foreach (MenuItem mito in order.MenuItems)
-                //{
-                //    MenuItemModel mim = await _context.MenuItem.FindAsync(mito.Id);
-
-                //    if (mim == null)
-                //        mim = await _context.MenuItem.FirstOrDefaultAsync(
-                //            o => o.Name.Replace(" ", "").ToLower().Equals(mito.Name.Replace(" ", "").ToLower()));
-
-                //    if (mim == null)
-                //        mim = mito.ToModelEntity();
-
-                //    if (newOrderMenuItems.Any(o => o.MenuItem == mim))
-                //        newOrderMenuItems.FirstOrDefault(o => o.MenuItem == mim).MenuItemCount++;
-                //    else
-                //        newOrderMenuItems.Add(new OrderMenuItem() { MenuItem = mim, MenuItemCount = 1 });
-                //}
-
-                List<OrderMenuItem> newOrderMenuItems = await CreateOrderMenuItemsAsync(order.MenuItems);
-
-                newOrderModel.OrderMenuItems.AddRange(newOrderMenuItems);
-
-                _context.Order.Add(newOrderModel);
+                _context.Order.Add(newOrder);
                 await _context.SaveChangesAsync();
 
-                //OrderDto createdOrder = newOrderModel.ToTransferObject();
-                OrderDto createdOrder = _mapper.Map<OrderDto>(newOrderModel);
-
-                return CreatedAtAction("GetOrder", new { id = newOrderModel.Id }, createdOrder);
+                return CreatedAtAction("GetOrder", new { id = newOrder.Id }, _mapper.Map<OrderDto>(newOrder));
             }
             catch (Exception ex)
             {
@@ -163,7 +149,7 @@ namespace Eetfestijnkassasystem.Api.Controllers
             if (id == 0)
                 return BadRequest("Order id not specified");
 
-            var order = await _context.Order.FindAsync(id);
+            var order = await FindOrderById(id);
 
             if (order == null)
                 return NotFound($"Order with id {id} not found");
@@ -180,23 +166,21 @@ namespace Eetfestijnkassasystem.Api.Controllers
             return _context.Order.Any(e => e.Id == id);
         }
 
+        private async Task<Order> FindOrderById(int id)
+        {
+            return await _context.Order
+                                 .Include(o => o.Payment)
+                                 .Include(o => o.OrderMenuItems)
+                                 .ThenInclude(o => o.MenuItem)
+                                 .FirstOrDefaultAsync(o => o.Id == id);
+        }
+
         private async Task<List<OrderMenuItem>> CreateOrderMenuItemsAsync(List<MenuItemDto> menuItems)
         {
             List<OrderMenuItem> orderMenuItems = new List<OrderMenuItem>();
 
             foreach (MenuItemDto menuItem in menuItems)
             {
-                //MenuItemModel model = await _context.MenuItem.FindAsync(menuItem.Id);
-
-                //if (model == null)
-                //{ 
-                //    model = await _context.MenuItem.FirstOrDefaultAsync(
-                //        o => o.Name.Replace(" ", "").ToLower().Equals(menuItem.Name.Replace(" ", "").ToLower()));
-                //}
-
-                //if (model == null)
-                //    model = menuItem.ToModelEntity();
-
                 MenuItem model = await FetchOrCreateMenuItemModelAsync(menuItem);
 
                 if (orderMenuItems.Any(o => o.MenuItem == model))
@@ -217,10 +201,7 @@ namespace Eetfestijnkassasystem.Api.Controllers
                                                                           .Equals(menuItem.Name.Replace(" ", "").ToLower()));
 
             if (model == null)
-            {
-                //model = menuItem.ToModelEntity();
                 model = _mapper.Map<MenuItem>(menuItem);
-            }
 
             return model;
         }

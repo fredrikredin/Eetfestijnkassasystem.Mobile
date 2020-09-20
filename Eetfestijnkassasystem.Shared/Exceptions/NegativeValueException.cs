@@ -7,7 +7,7 @@ namespace Eetfestijnkassasystem.Shared.Exceptions
         public NegativeValueException(string model, string property, double value) : base(model, property)
         {
             Value = value;
-            Type = $"{GetType().Name.Replace("`1", "")}: {nameof(Model)}={Model}, {nameof(Property)}={Property}, {nameof(Value)}={Value}";
+            Type = $"{GetType().Name}: {nameof(Model)}={Model}, {nameof(Property)}={Property}, {nameof(Value)}={Value}";
         }
 
         public double Value { get; set; }

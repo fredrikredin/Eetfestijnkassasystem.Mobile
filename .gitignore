@@ -4,8 +4,10 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # Datebase & Migrations
-Eetfestijnkassasystem.Mobile/Eetfestijnkassasystem.Api/Data/eetfestijn.db
-Eetfestijnkassasystem.Mobile/Eetfestijnkassasystem.Api/Migrations/
+Eetfestijnkassasystem.Api/Data/*.db
+Eetfestijnkassasystem.Api/Data/*.db-shm
+Eetfestijnkassasystem.Api/Data/*.db-wal
+Eetfestijnkassasystem.Api/Migrations/
 
 # Helper scripts
 deleteAndroidBinObjDir.bat

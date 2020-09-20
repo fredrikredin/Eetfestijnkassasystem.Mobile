@@ -4,13 +4,26 @@ using Eetfestijnkassasystem.Shared.Exceptions;
 
 namespace Eetfestijnkassasystem.Shared.Model
 {
-    public class Payment : EntityBase //, IModelFor<PaymentDto>
+    public class Payment : EntityBase
     {
+        private double totalCost_;
         private double _amountCashPaid;
         private double _amountCashReturn;
         private int _numberOfPaymentCards;
 
         public Payment() : base() { }
+
+        public double TotalCost
+        {
+            get { return totalCost_; }
+            set
+            {
+                if (value < 0)
+                    throw new NegativeValueException(nameof(PaymentDto), nameof(TotalCost), value);
+
+                totalCost_ = value;
+            }
+        }
 
         public double AmountCashPaid
         {

@@ -1,15 +1,12 @@
-﻿using System;
+﻿using System.Linq;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Eetfestijnkassasystem.Api.Data;
 using Eetfestijnkassasystem.Shared.Model;
 using Eetfestijnkassasystem.Shared.DTO;
-using System.Net;
-using AutoMapper;
 
 namespace Eetfestijnkassasystem.Api.Controllers
 {
@@ -30,22 +27,19 @@ namespace Eetfestijnkassasystem.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MenuItemDto>>> GetMenuItem()
         {
-            List<MenuItem> models = await _context.MenuItem.ToListAsync();
-            //List<MenuItemDto> dtos = models.Select(o => o.ToTransferObject()).ToList();
-            List<MenuItemDto> dtos = models.Select(o => _mapper.Map<MenuItemDto>(o)).ToList();
-            return dtos;
+            List<MenuItem> models = await _context.MenuItem.Include(o => o.OrderMenuItems).ToListAsync();
+            return models.Select(o => _mapper.Map<MenuItemDto>(o)).ToList();
         }
 
         // GET: api/MenuItems/5
         [HttpGet("{id}")]
         public async Task<ActionResult<MenuItemDto>> GetMenuItem(int id)
         {
-            MenuItem model = await _context.MenuItem.FindAsync(id);
+            MenuItem model = await _context.MenuItem.Include(o => o.OrderMenuItems).FirstOrDefaultAsync(o => o.Id == id);
 
             if (model == null)
                 return NotFound();
 
-            //return model.ToTransferObject();
             return _mapper.Map<MenuItemDto>(model);
         }
 
@@ -111,7 +105,8 @@ namespace Eetfestijnkassasystem.Api.Controllers
 
         // DELETE: api/MenuItems/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<MenuItemDto>> DeleteMenuItem(int id)
+        //public async Task<ActionResult<MenuItemDto>> DeleteMenuItem(int id)
+        public async Task<ActionResult> DeleteMenuItem(int id)
         {
             if (id == 0)
                 return BadRequest();

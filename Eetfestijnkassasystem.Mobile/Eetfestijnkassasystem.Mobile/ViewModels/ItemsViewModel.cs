@@ -64,16 +64,25 @@ namespace Eetfestijnkassasystem.Mobile.ViewModels
                 IRepository<OrderDto> orderRepository = DependencyService.Get<IRepository<OrderDto>>();
 
                 // order 1
-                OrderDto order1 = new OrderDto() { CustomerName = "Linake", Comment = "Extra napkins", Seating = "Table 7", };
-                order1.MenuItems.Add(new MenuItemDto() { Name = "Cheese burger", Cost = 6.0 });
-                order1.MenuItems.Add(new MenuItemDto() { Name = "Coke", Cost = 3.0 });
-                order1.MenuItems.Add(new MenuItemDto() { Name = "Sparkling water", Cost = 2.0 });
-                order1 = await orderRepository.AddAsync(order1);
+                //OrderDto order1 = new OrderDto() { CustomerName = "Linake", Comment = "Extra napkins", Seating = "Table 7", };
+                //order1.MenuItems.Add(new MenuItemDto() { Name = "Cheese burger", Cost = 6.0 });
+                //order1.MenuItems.Add(new MenuItemDto() { Name = "Coke", Cost = 3.0 });
+                //order1.MenuItems.Add(new MenuItemDto() { Name = "Sparkling water", Cost = 2.0 });
+                //order1 = await orderRepository.AddAsync(order1);
 
-                //OrderDto order1 = await orderRepository.GetByIdAsync(1);
+                OrderDto order1 = await orderRepository.GetByIdAsync(1);
+
+                //order1.Payment = new PaymentDto()
+                //{
+                //    TotalCost = order1.MenuItems.Sum(o => o.Cost),
+                //    AmountCashPaid = 20,
+                //    NumberOfPaymentCards = 0,
+                //    AmountCashReturn = 20 - order1.MenuItems.Sum(o => o.Cost),
+                //};
+                
 
                 MenuItemDto cheeseBurger = order1.MenuItems[0];
-                MenuItemDto sparklingWater = order1.MenuItems[2];
+                MenuItemDto sparklingWater = new MenuItemDto() { Name = "Sparkling water", Cost = 2.0 };
 
                 // order 2
                 OrderDto order2 = new OrderDto("Linake");

@@ -10,7 +10,8 @@ namespace Eetfestijnkassasystem.Api.Mappings
         public MenuProfile()
         {
             CreateMap<MenuItem, MenuItemDto>()
-                .ForMember(dto => dto.Orders, o => o.MapFrom(model => model.OrderMenuItems.Select(o => o.OrderId).ToList()))
+                .ForMember(dto => dto.AddedToOrders, o => o.MapFrom(model => model.OrderMenuItems.Select(o => o.OrderId).ToList()))
+                .ForMember(dto => dto.AccumulatedOrderCount, o => o.MapFrom(model => model.OrderMenuItems.Sum(o => o.MenuItemCount)))
                 .ReverseMap();
         }
     }

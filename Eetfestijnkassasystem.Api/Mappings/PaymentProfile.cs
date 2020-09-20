@@ -8,8 +8,7 @@ namespace Eetfestijnkassasystem.Api.Mappings
     {
         public PaymentProfile()
         {
-            CreateMap<Payment, PaymentDto>()
-                .ReverseMap();
+            CreateMap<Payment, PaymentDto>().ReverseMap();
         }
     }
 }

@@ -15,12 +15,11 @@ https://docs.microsoft.com/en-us/aspnet/core/web-api/handle-errors?view=aspnetco
 https://stackoverflow.com/questions/38630076/asp-net-core-web-api-exception-handling
 https://www.youtube.com/watch?v=95EbHz3aKYA
 
-
 https://www.learnentityframeworkcore.com/configuration/many-to-many-relationship-configuration
-
 
 https://dotnetcoretutorials.com/2020/03/15/fixing-json-self-referencing-loop-exceptions/
 
+https://dev.to/_patrickgod/update-remove-entities-in-net-core-3-1-web-api-with-put-delete-3o2k
 
 
 Build the solution:

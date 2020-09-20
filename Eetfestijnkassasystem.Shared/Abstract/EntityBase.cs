@@ -12,5 +12,7 @@ namespace Eetfestijnkassasystem.Shared.Abstract
 
         public int Id { get; set; }
         public DateTime DateTimeCreated { get; set; }
+
+        public override string ToString() => $"Id={Id}, Created={DateTimeCreated}";
     }
 }

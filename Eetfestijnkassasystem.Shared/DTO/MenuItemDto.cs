@@ -7,12 +7,13 @@ namespace Eetfestijnkassasystem.Shared.DTO
     {
         public string Name { get; set; }
         public double Cost { get; set; }
-        public List<int> Orders { get; set; }
+        public List<int> AddedToOrders { get; set; }
+        public int AccumulatedOrderCount { get; set; }
 
         public MenuItemDto()
         {
-            if (Orders == null)
-                Orders = new List<int>();
+            if (AddedToOrders == null)
+                AddedToOrders = new List<int>();
         }
 
         public MenuItemDto(string name) : this()
